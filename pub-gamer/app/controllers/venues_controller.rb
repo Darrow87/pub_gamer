@@ -1,8 +1,24 @@
 class VenuesController < ApplicationController
 # skip_before_action :verify_authenticity_token, only: [:create]
+  # autocomplete: :venue, :name
+
   def index
-    @venues = Venue.all
     @favorites = current_user.favorites
+    if params[:commit] == "Search"
+        @venues = Venue.search(params[:query])
+        if @venues.length == 1 && @venues.first.name == params[:query]
+          redirect_to venue_path(@venues.first)
+        end
+    else
+      @venues = Venue.all
+    end
+  end
+
+  def search
+    respond_to do |format|
+      format.html
+      format.json { @results = Venue.search(params[:term]) + Game.game_search(params[:term]) }
+    end
   end
 
   def new
