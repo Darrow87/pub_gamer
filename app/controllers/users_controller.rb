@@ -121,8 +121,6 @@ class UsersController < ApplicationController
         @created_events = @user.created_events
         @upcoming_events = @user.events
       end
-    else
-      redirect_to root_path
     end
   end
 
@@ -131,8 +129,8 @@ class UsersController < ApplicationController
     if !request.xhr?
       if @user.save
         session[:user_id] = @user.id
-        UserMailer.welcome_email(@user).deliver_now
-        redirect_to user_path(@user)
+        # UserMailer.welcome_email(@user).deliver_now
+        redirect_to user_profile_path(@user)
       else
         user_errors = @user.errors.full_messages
         redirect_to root_path, :flash => { :error => user_errors }

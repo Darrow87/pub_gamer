@@ -2,16 +2,21 @@ class User < ActiveRecord::Base
   has_secure_password
   validates :user_name, :email, :password, :birthday, presence: true
   validates :user_name, :email, uniqueness: true
+  validates_length_of :password, in: 7..30, message: "Password must be between 7 and 30 characters"
   validates_length_of :first_name, maximum: 50, message: "50 character max"
   validates_length_of :last_name, maximum: 50, message: "50 character max"
   validates_length_of :user_name, maximum: 50, message: "50 character max"
   validates_length_of :email, maximum: 100, message: "over character limit"
-  validates_length_of :bio, maximum: 500, message: "over character limit"
-  # validates_inclusion_of :age, in: 18..99
+  validates_length_of :bio, maximum: 200, message: "over character limit"
   has_attached_file :photo,
-  	styles: { medium: "200x200>", small: "100x100>", thumb: "60x60>" },
-  	default_url: "/images/:style/octopus0.3opacity.png"
+  	styles: { small: "100x100>", thumb: "60x60>" },
+  	convert_options: { thumb: "-quality 75 -strip", small: "-quality 75 -strip" },
+  	default_url: "missing_:style.png"
   validates_attachment :photo, content_type: { content_type: ["image/jpeg", "image/gif", "image/png"] }
+
+  validates :user_name, format: {
+  	with: /\A[a-zA-Z0-9_\-\.]+\z/,
+  	message: "Invalid characters: Acceptable characters are A-Z, a-z, 0-9, _, -, ."}
 
   has_many :reviews
   has_many :user_venues
@@ -19,6 +24,10 @@ class User < ActiveRecord::Base
   has_many :user_events
   has_many :events, through: :user_events
   has_many :user_reports
+
+  def full_name
+  	self.first_name + " " + self.last_name
+  end
 
   def has_favorited?(venue)
   	self.favorites.include?(venue)
@@ -102,7 +111,7 @@ class User < ActiveRecord::Base
 	end
 
   def slug
-    user_name.parameterize
+    user_name.gsub(" ", "-")  
   end
 
   def to_param

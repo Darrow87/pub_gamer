@@ -13,6 +13,10 @@ class Venue < ActiveRecord::Base
 	validates :name, :address, presence: true
 	validates :address, uniqueness: true
 	validates_length_of :name, :address, maximum: 150, message: "over character limit"
+	validates :name, format: {
+		with: /\A[\d\sa-zA-Z_\.\,\-\+\!\?]+\z/,
+		message: "Invalid characters: Acceptable characters are A-Z, a-z, 0-9"
+	}
 
 	def game
 	end
@@ -21,12 +25,11 @@ class Venue < ActiveRecord::Base
 		Neighborhood.find_or_create_by(name: hood.titleize)
 	end
 
-	# def self.single_phrase_search(term)
-	# 	venues = Venue.venue_search(term) + Venue.game_search(term)
-	# 	venues.uniq
-	# end
-
 	def self.search(term)
+		term = term.gsub(/[^\d\sa-zA-Z_\.\,\-\+\!\?]/, "")
+		# term = term.gsub(/[\'s\o']/,'')
+		# term = term.gsub(/[^0-9a-zA-Z_\,\.\+\-\?]/,'')
+		# term = term.gsub("'","").gsub("&", "")
 		venues = Venue.venue_search(term) + Venue.multi_word_search(term) + Venue.game_search(term) + Venue.search_neighborhood(term)
 		venues.uniq
 	end
@@ -46,7 +49,6 @@ class Venue < ActiveRecord::Base
 
 	def self.search_neighborhood(term)
 		joins(:neighborhood).where("neighborhoods.name ILIKE :term", term: "%#{term.downcase}%").uniq
-		# where("neighborhood ILIKE :term", term: "%#{term.downcase}%").pluck(:neighborhood).uniq
 	end
 
 #used in add_venue, events controller:
@@ -107,4 +109,28 @@ class Venue < ActiveRecord::Base
 		avg_rating.round(2)
 	end
 
+	# def replaceAnd
+	# 	name.gsub!("&","\&")
+	# end
+
+	# def removeCharacters
+	# 	name.gsub!("'", "")
+	# end
+
+	# def replaceCharacters
+	# 	self.replaceAnd
+	# 	self.removeCharacters
+	# end
+
+	def slug
+		self.name.gsub(" ", "-")
+	end
+
+	def to_param
+		"#{id}-#{slug}"
+	end
+
 end
+
+# & ' ( )
+# - _ + , . 

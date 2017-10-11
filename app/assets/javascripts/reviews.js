@@ -1,6 +1,6 @@
 $(document).ready(function() {
   // sets new review form as dialog
-  $('#new-review-form').dialog(dialogOptions)
+  $('#new-review-form').dialog(dialogOptions).parent().draggable();
 
   // opens form for new venue review
   $('.new-review-button').on('click', function(event){
@@ -26,15 +26,23 @@ $(document).ready(function() {
     height: reviewShowHeight,
     position: ({ my: 'top', at: 'top+17%', of: window}),
     close: emptyDialogBox
-  })
+  }).parent().draggable();
 
   $('#reviews').on('click', '.read-more-review', function(event){
+    $target = $(event.target)
     event.preventDefault();
     $('#full-review-content').dialog('open')
     $.ajax({
       url: this.href
     }).done(function(response){
       $('#full-review-content').html(response);
+      var $dialogBox = $('#full-review-content').parent()
+      $dialogBox.on('mousedown', '#review-content', function(event){
+        $dialogBox.draggable('disable');
+      })
+      $dialogBox.on('mouseup', '#review-content', function(event){
+        $dialogBox.draggable('enable');
+      })
     })
   })
 

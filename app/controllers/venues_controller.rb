@@ -1,6 +1,6 @@
 require 'will_paginate/array'
 class VenuesController < ApplicationController
-  before_filter :require_login
+  before_filter :require_login, except: [:index, :dropdown, :results, :search]
 # skip_before_action :verify_authenticity_token, only: [:create]
 
   def index
@@ -71,6 +71,7 @@ class VenuesController < ApplicationController
     @venue = Venue.new(venue_params)
     if !request.xhr?
       @venue.neighborhood = Neighborhood.find_or_create_by(name: params[:venue][:neighborhood].titleize)
+      @venue.name = @venue.name.gsub("&","and").gsub(/[^\d\sa-zA-Z_\.\,\-\+\!\?]/,'')
       if @venue.save
         if params[:games]
           @venue.games << Game.find(params[:games])

@@ -2,9 +2,9 @@ $(document).ready(function() {
 
   var openEventForm = function() {
     resetEventForm();
-    // openFunction();
+    stopScroll();
     if (window.location.pathname.includes("venue") ) {
-      barName = $('#venue-name').text()
+      barName = $('#venue-name').text().substring(2)
       barAddress = $('#get-venue-address').text()
       $('#event_location').val(barName);
       $('#event_location').prop('readonly', true);
@@ -14,14 +14,14 @@ $(document).ready(function() {
   }
 
   var resetEventForm = function() {
-    $('#event-create-form')[0].reset();
+    $formBox = $('#event-create-form')[0].reset()
     $('.select-game').removeClass('select-game');
   }
+  
   $("#event-create-container").dialog(dialogOptions, {
     open: openEventForm,
-    position: ({ my: 'middle top', at: 'middle top+50', of: window, collision: 'fit' }),
     close: resetEventForm
-  })
+  }).parent().draggable();
 
   $('#event-create-container, #edit-event-box').on('click', '#add-new-game', function(event){
     event.preventDefault();

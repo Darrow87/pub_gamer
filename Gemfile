@@ -29,6 +29,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # gem 'bcrypt', '~> 3.1.7'
 gem 'jquery-ui-rails'
 gem 'jquery-modal-rails'
+# gem 'touchpunch-rails'
 # Use Unicorn as the app server
 # gem 'unicorn'
 
@@ -40,6 +41,7 @@ gem 'pry-rails'
 gem 'will_paginate'
 
 gem "paperclip", "~> 5.0.0"
+gem "aws-sdk", "~> 2.3"
 
 gem "figaro"
 
